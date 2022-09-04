@@ -55,14 +55,15 @@ const callForwarding = () => {
  */
 const goToVoiceMail = () => {
   const response = new VoiceResponse();
-  response.say("Please record your message.");
-  const dial = response.dial({
-    record: "record-from-ringing",
-    recordingTrack: "inbound",
-    recordingStatusCallback: "https://www.myexample.com/recording-handler",
+  response.say(
+    "Please leave a message at the beep.\nPress the star key when finished."
+  );
+  response.record({
+    method: "GET",
+    maxLength: 20,
+    finishOnKey: "*",
   });
-
-  return response.toString();
+  response.say("I did not receive a recording");
 };
 
 const retrieveCallLogs = () => {
@@ -80,16 +81,17 @@ const retrieveCallLogs = () => {
       from: calls.from,
       startTime: calls.start_time,
       endTime: calls.end_time,
-      duration: calls.duration
+      duration: calls.duration,
     });
 
-    call.save()
-  .then(() => {
-    console.log('Call data saved in DB');
-    console.log(call);
-    return mongoose.connection.close()
-  })
-  .catch((err) => console.log(err))
+    call
+      .save()
+      .then(() => {
+        console.log("Call data saved in DB");
+        console.log(call);
+        return mongoose.connection.close();
+      })
+      .catch((err) => console.log(err));
   });
 };
 
